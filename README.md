@@ -1,56 +1,84 @@
-# Bulk Youtube Downloader
+# Bulk `/(YouTube|Video)/` Downloader
+Download multiple videos at once with one simple script.  
+Works with Youtube and [all other sites supported by `yt-dlp`](https://github.com/yt-dlp/yt-dlp/blob/master/supportedsites.md).
 
-## How to download all videos from a channel ?
+## Prerequisites
+- Download `yt-dlp`
+  - For Linux-based systems, [this](https://github.com/yt-dlp/yt-dlp/wiki/Installation#apt) is probably the easiest way
+  - For Windows, [winget](https://github.com/yt-dlp/yt-dlp/wiki/Installation#winget) might be the easiest, although if you don't have winget, just download the [`.exe`](https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp.exe) and put it somewhere in your PATH (if you don't know what that is, create a folder called `yt-dlp` in `C:\Program Files`, put the exe there, do <kbd>Win</kbd> + <kbd>R</kbd>, `systempropertiesadvanced`, Environment Variables, in System variables double click on `Path`, new, `C:\Program Files\yt-dlp` and OK all the way out), in that case use `yt-dlp -U` to update it later
+  - If you have it installed with `pip`, make sure to update it to the latest version that has `ejs` support by running `pip install -U yt-dlp[default]`
+- Download `FFmpeg`
+  - For Linux-based systems, it should already be installed, otherwise check [this](https://www.ffmpeg.org/download.html#build-linux)
+  - For Windows, either run `winget install ffmpeg` or download [this](https://www.gyan.dev/ffmpeg/builds/ffmpeg-git-full.7z) and follow the same instructions as above to add it to your PATH
+- Download `Deno` (required to support YouTube download with the latest `yt-dlp` versions)
+  - For Linux-based systems, run `curl -fsSL https://deno.land/install.sh | sh`
+  - For Windows, either run `winget install DenoLand.Deno` or `irm https://deno.land/install.ps1 | iex` in Powershell
 
-0. Extract the `ffmpeg.7z` archive (use any good program like PeaZip, 7Zip or WinRar for this)  
-**THE FILES MUST BE IN THE SAME FOLDER AS THE OTHERS, NOT IN A SUBFOLDER !**
-1. Go on the Youtube channel, go on the Videos tab, and scroll down until no new video pops out (yes it takes time)
-2. Open the console (F12 -> Console) and paste the following line :
-```javascript
-copy(Array.from(new Set(Array.from(document.links).filter((l) => l.href?.includes('watch?v=')).map(x => x.href.split('&')[0]))))
-```
-Then hit enter  
-3. Open the `yt.txt` file, delete everything and paste (Ctrl + V)
-*if you see no link, run the following command instead :*
-```javascript
-copy(Array.from(new Set(Array.from(document.links).filter((l) => l.href?.includes('.be/')).map(x => x.href.split('&')[0]))))
-```
-4. Run the `dl.bat` file
-
-## Tutorial in video :
-https://github.com/EDM115/bulk-youtube-download/assets/82015596/8ab3de7d-27ca-42b4-890b-e596f1592e8e
-*(also available in the repo)*
-
-## Error ?
-
-- The `yt.txt` should look like this :
-```
-[
+## Usage
+- Download the script file [`bulk-youtube-download.bat`](https://github.com/EDM115/bulk-youtube-download/releases/latest/download/bulk-youtube-download.bat) (or [`bulk-youtube-download.sh`](https://github.com/EDM115/bulk-youtube-download/releases/latest/download/bulk-youtube-download.sh) for Linux/Mac) and put it somewhere you want
+- Create a text file called `links.txt` in the same folder as the script
+- Put your links in the `links.txt` file as a JSON array, for example :
+  ```json
+  [
+    "https://youtu.be/7ssVNgOK_MM",
+    "https://youtu.be/xyLWY2wXbho",
+    "https://youtu.be/p0dw-276t7w",
     "https://www.youtube.com/watch?v=dYVoZJXuhxk",
     "https://www.youtube.com/watch?v=1TwBc7B46X0",
     "https://www.youtube.com/watch?v=h2csePLbahQ",
     "https://www.youtube.com/watch?v=-m1EzV-i3WI",
     "https://www.youtube.com/watch?v=-JdZsKzYWhI"
-]
-```
+  ]
+  ```
+- Open a terminal/command prompt in the folder where you put the script and the `links.txt` file
+- Run the script :
+  - On Windows : `.\bulk-youtube-download.bat`
+  - On Linux/Mac : `./bulk-youtube-download.sh`
+- Congrats, the videos are now in the `downloads` folder !
+
+## Default download options and how to change them
+By default, the script uses the following options :
+- Format : best video + best audio, fallback to best if not available
+- Embed subtitles (if available)
+- Embed thumbnail
+- Embed metadata
+- Embed chapters (if available)
+- No playlist (only download the video if a playlist link is given)
+- Display progress bar
+- Output folder : `downloads` (created if it doesn't exist), filename format : `Video Title [Video ID].ext`
+
+To change these options, just pass what you want after the script name, for example `.\bulk-youtube-download.bat -f "bestvideo[height<=720]+bestaudio/best" --no-embed-subs -o "downloads/%%(title)s.%%(ext)s"`.  
+A list of options can be found [here](https://github.com/yt-dlp/yt-dlp#usage-and-options).  
+Here are some options that might be worth using :
+- `--yes-playlist` if you want to download full playlists when a playlist link is given
+- `-s -F` to see the available formats for each video without downloading
+- `-f "format"` to specify the format to download, see [this](https://github.com/yt-dlp/yt-dlp#format-selection)
+- `-o "downloads/output_template` : change the output folder and/or filename format, see [this](https://github.com/yt-dlp/yt-dlp#output-template)  
+  ⚠️ **WARNING** : on Windows, make sure to double the `%` signs in the output template (example : use `%%(title)s` instead of `%(title)s`). Also it's best to keep the `downloads/` part to avoid cluttering the script folder with all the downloaded videos
+- `--sub-langs` to specify which subtitles to download, use `--list-subs` before to see available languages
+- `-x` to extract audio only for videos that don't provide separate audio and video streams
+- `--force-keyframes-at-cuts --sponsorblock-remove sponsor,selfpromo` to remove segments of the video, see [this](https://github.com/yt-dlp/yt-dlp#sponsorblock-options) for available categories. The `--force-keyframes-at-cuts` option is recommended to have better results when cutting the video, although it takes longer to process
+
+## How to download all videos from a channel ?
+1. Go on the Youtube channel, go on the Videos tab, reload the page and scroll down until no new video pops out (yes it can take some time)
+2. Open the console (<kbd>F12</kbd> -> Console) paste the following line and hit enter :
+   ```js
+   copy(Array.from(new Set(Array.from(document.links).filter((l) => l.href?.includes("watch?v=")).map((x) => x.href.split("&")[0]))))
+   ```
+3. Open the `links.txt` file, delete everything, paste (<kbd>Ctrl</kbd> + <kbd>V</kbd>) and save the file
+> [!TIP]  
+> if you see no link, run the following command instead :
+> ```js
+> copy(Array.from(new Set(Array.from(document.links).filter((l) => l.href?.includes(".be/")).map((x) => x.href.split("&")[0]))))
+> ```
+
+## Demo
+<video src="https://github.com/EDM115/bulk-youtube-download/assets/82015596/8ab3de7d-27ca-42b4-890b-e596f1592e8e" width="1920" height="1080"></video>
+
+## You have an error ?
 - The video may be geo-restricted
+- If you have any special error message, [open an issue **here first**](https://github.com/EDM115/bulk-youtube-download/issues/new/choose) to not bloat yt-dlp's repo
 
-## Scalability :
-
-- Just open the `dl.bat` and edit the line 69
-- All yt-dlp options can be found on their README (check the very next link)
-
-## Attribution :
-
-- `yt-dlp` is an open-source project released under the Unilicence licence : https://github.com/yt-dlp/yt-dlp
-- `FFmpeg` is an open-source project released under the LGPL v2.1+ and GPL v2+ licences : https://github.com/FFmpeg/FFmpeg
-- This simple project is released under the MIT Licence
-
-## Versions used :
-
-- `yt-dlp` : 2023.09.24
-- `FFmpeg` : 2023-08-10
-
-## Credits :
-- Program created by me ([@EDM115](https://github.com/EDM115))
+## Credits
+- Script created by myself ([@EDM115](https://github.com/EDM115))
 - Inspired by a request of [Crystal](https://t.me/Cris_admin)

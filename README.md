@@ -73,7 +73,7 @@ Here are some options that might be worth using :
 > ```
 
 ## Demo
-<video src="https://github.com/EDM115/bulk-youtube-download/assets/82015596/8ab3de7d-27ca-42b4-890b-e596f1592e8e" width="1920" height="1080"></video>
+<video src="https://github.com/user-attachments/assets/6ebc63ea-737e-46e0-87ee-b403b2272ae4" width="1920" height="1080"></video>
 
 ## You have an error ?
 - The video may be geo-restricted

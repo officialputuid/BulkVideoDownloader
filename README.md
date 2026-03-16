@@ -1,6 +1,12 @@
+<div align="center">
+
 # Bulk `/(YouTube|Video)/` Downloader
-Download multiple videos at once with one simple script.  
+## Download multiple videos at once with one simple script.  
 Works with Youtube and [all other sites supported by `yt-dlp`](https://github.com/yt-dlp/yt-dlp/blob/master/supportedsites.md).
+
+![Total downloads](https://img.shields.io/github/downloads/EDM115/bulk-youtube-download/total?style=for-the-badge&label=Total%20downloads)
+
+</div>
 
 ## Prerequisites
 - Download `yt-dlp`
